@@ -1,7 +1,6 @@
-import { readdir } from "fs";
+import { readdir, mkdir } from "fs";
 import {resolve} from "path";
 import sharp from "sharp";
-import * as fs from "fs";
 
 const size: [number, number] = [50, 50]
 
@@ -12,7 +11,7 @@ readdir(resolve('./input'), (err, files) => {
             return file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg')
         })
 
-        fs.mkdir('./output', (err) => {
+        mkdir('./output', (err) => {
             if(err) console.log(err)
             else {
                 pics.forEach((pic) => {
