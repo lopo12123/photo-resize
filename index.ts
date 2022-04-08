@@ -18,8 +18,8 @@ readdir(resolve('./input'), (err, files) => {
                     sharp(`./input/${ pic }`)
                         .resize(...size)
                         .toFile(`./output/${ pic }`, (err) => {
-                            if(err) console.log(`fail to resize [${ pic }]`)
-                            else console.log(`success to resize [${ pic }]`)
+                            if(err) console.log(`[×] ${ pic }`)
+                            else console.log(`[√] ${ pic }`)
                         })
                 })
             }
