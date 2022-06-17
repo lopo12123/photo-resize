@@ -34,14 +34,14 @@ const emits = defineEmits<{
 
         <div class="detail-single">
             <div class="btn" title="从列表移除"
-                 @click="emits('del-img')">
+                 @click.stop="emits('del-img')">
                 移除
             </div>
         </div>
 
         <div class="detail-single">
             <div class="btn" title="直接下载50*50的图片"
-                 @click="emits('direct50')">
+                 @click.stop="emits('direct50')">
                 50 * 50
             </div>
         </div>
