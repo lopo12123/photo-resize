@@ -81,9 +81,11 @@ const emits = defineEmits<{
     .detail-single {
         width: 100%;
         height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
+        color: #777;
+        font-style: italic;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         .btn {
             height: 1.5rem;
@@ -92,6 +94,7 @@ const emits = defineEmits<{
             border-radius: 0.3125rem;
             color: #777;
             font-size: 0.75rem;
+            font-style: normal;
             display: flex;
             align-items: center;
             justify-content: center;
