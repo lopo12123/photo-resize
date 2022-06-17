@@ -39,13 +39,19 @@ const loadImages = () => {
 
     ipt.onchange = () => {
         const files = ipt.files;
+
+        if(!files) {
+            alert('无文件');
+            return;
+        }
+
         for (let i = 0; i < files.length; i++) {
             try {
                 const reader = new FileReader();
                 reader.onload = () => {
                     panelItems.value.push({
                         filename: files[i].name,
-                        base64: reader.result,
+                        base64: reader.result as string,
                         size: getSizeWithUnit(files[i].size)
                     })
                 }
@@ -102,7 +108,7 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
     img.src = base64;
 
     img.onload = () => {
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d')!;
         ctx.drawImage(img, 0, 0, w, h);
 
         const anchor = document.createElement('a');
