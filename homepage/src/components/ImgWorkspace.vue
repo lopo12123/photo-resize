@@ -1,17 +1,43 @@
 <script lang="ts" setup>
-import { ImgOverviewProp } from "@/components/ImgOverview.vue";
 import { onMounted, ref } from "vue";
+import Slider from "primevue/slider";
+import { ImgOverviewProp } from "@/components/ImgOverview.vue";
 
-const props = defineProps<{
+defineProps<{
     pic: ImgOverviewProp
 }>()
 
+const emits = defineEmits<{
+    (ev: 'download-img', filename: string, base64: string, w: number, h: number): void
+}>()
+
+const imgBox = ref<HTMLDivElement | null>(null)
 const imgRef = ref<HTMLImageElement | null>(null)
-const size = ref([ 0, 0 ])
+const originSize = ref([ 50, 50 ])
+const currSize = ref([ 0, 0 ])
+
+const reset = () => {
+    currSize.value = originSize.value
+    updateImgSize()
+}
+
+const updateImgSize = () => {
+    const box = imgBox.value
+    if(!!box) {
+        box.style.width = currSize.value[0] + 'px'
+        box.style.height = currSize.value[1] + 'px'
+    }
+}
 
 onMounted(() => {
-    console.log(imgRef.value, imgRef.value?.width, imgRef.value?.height)
-    // size.value = imgRef.value!.width
+    imgRef.value!.onload = () => {
+        const img = imgRef.value
+        if(!!img) {
+            originSize.value = [ img.width, img.height ]
+            currSize.value = [ img.width, img.height ]
+            updateImgSize()
+        }
+    }
 })
 </script>
 
@@ -28,25 +54,47 @@ onMounted(() => {
 
         <div class="operates">
             <div class="item">
-                <div class="key">
-                    宽度:
-                </div>
+                <div class="key">宽度:</div>
                 <div class="val">
-                    progress
+                    <input class="num" type="number"
+                           v-model="currSize[0]"
+                           @change="updateImgSize">px
                 </div>
             </div>
             <div class="item">
-                <div class="key">
-                    高度:
-                </div>
+                <Slider class="bar" v-model="currSize[0]"
+                        :min="10" :max="300"
+                        @change="updateImgSize"/>
+            </div>
+            <div class="item">
+                <div class="key">高度:</div>
                 <div class="val">
-                    progress
+                    <input class="num" type="number"
+                           v-model="currSize[1]"
+                           @change="updateImgSize">px
+                </div>
+            </div>
+            <div class="item">
+                <Slider class="bar" v-model="currSize[1]"
+                        :min="10" :max="300"
+                        @change="updateImgSize"/>
+            </div>
+            <div class="item">
+                <div class="btn" @click="reset"
+                     :title="`将图片重置为原始尺寸(${originSize[0]}*${originSize[1]})`">
+                    重置
+                </div>
+                <div class="btn" @click="emits('download-img', pic.filename, pic.base64, currSize[0], currSize[1])"
+                     :title="`下载当前尺寸图片(${currSize[0]}*${currSize[1]})`">
+                    下载
                 </div>
             </div>
         </div>
 
         <div class="viewport">
-            <img ref="imgRef" :src="pic.base64" alt="">
+            <div class="img-box" ref="imgBox">
+                <img ref="imgRef" :src="pic.base64" alt="">
+            </div>
         </div>
     </div>
 </template>
@@ -83,8 +131,43 @@ onMounted(() => {
     .operates {
         position: absolute;
         z-index: 10;
-        top: 0;
-        right: 0;
+        top: 1rem;
+        right: 1rem;
+
+
+        .item {
+            width: 10rem;
+            height: 2rem;
+            color: #777;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .num {
+                width: 5rem;
+                height: 1.875rem;
+                margin: 0 0.625rem;
+                border: none;
+                border-bottom: solid 1px #ccc;
+                outline: none;
+                color: #777;
+                font-style: italic;
+
+                &::-webkit-inner-spin-button {
+                    display: none;
+                }
+            }
+
+            .bar {
+                width: 100%;
+            }
+
+            .btn {
+                text-decoration: underline dashed;
+                user-select: none;
+                cursor: pointer;
+            }
+        }
     }
 
     .viewport {
@@ -95,6 +178,17 @@ onMounted(() => {
         display: flex;
         align-items: center;
         justify-content: center;
+
+        .img-box {
+            width: fit-content;
+            height: fit-content;
+
+            img {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+        }
     }
 }
 </style>

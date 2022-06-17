@@ -75,7 +75,6 @@ const loadImages = () => {
  */
 const updateWorkspace = (idx: number) => {
     activeImgIdx.value = idx;
-    // 绘制 ...
 }
 
 /**
@@ -108,10 +107,12 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
 
     img.onload = () => {
         const ctx = canvas.getContext('2d')!;
+        // ctx.fillStyle = '#fff';
+        // ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
 
         const anchor = document.createElement('a');
-        anchor.href = canvas.toDataURL();
+        anchor.href = canvas.toDataURL('image/png');
         anchor.download = `resized_${ w }_${ h }_${ filename }`;
         anchor.click();
     }
@@ -132,7 +133,9 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
                          @click="updateWorkspace(idx)"/>
         </SplitterPanel>
         <SplitterPanel class="workspace-container" :size="80" :minSize="70">
-            <ImgWorkspace v-if="activeImgIdx >= 0 && activeImgIdx < panelItems.length" :pic="panelItems[activeImgIdx]"/>
+            <ImgWorkspace v-if="activeImgIdx >= 0 && activeImgIdx < panelItems.length"
+                          :pic="panelItems[activeImgIdx]" :key="activeImgIdx"
+                          @download-img="downloadImg"/>
         </SplitterPanel>
     </Splitter>
 </template>
