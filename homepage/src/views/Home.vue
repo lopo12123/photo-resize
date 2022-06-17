@@ -59,8 +59,7 @@ const loadImages = () => {
                     console.log(`error occurred when reading "${ files[i].name }": `, e);
                 }
                 reader.readAsDataURL(files[i]);
-            }
-            catch (e) {
+            } catch (e) {
                 console.log(`error occurred when solving "${ files[i].name }": `, e);
             }
         }
@@ -133,7 +132,7 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
                          @click="updateWorkspace(idx)"/>
         </SplitterPanel>
         <SplitterPanel class="workspace-container" :size="80" :minSize="70">
-            <ImgWorkspace v-if="activeImgIdx !== -1" :pic="panelItems[activeImgIdx]"/>
+            <ImgWorkspace v-if="activeImgIdx >= 0 && activeImgIdx < panelItems.length" :pic="panelItems[activeImgIdx]"/>
         </SplitterPanel>
     </Splitter>
 </template>
@@ -178,8 +177,12 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
     }
 
     .workspace-container {
-        padding: 10px;
-        overflow: auto;
+        .wrapper {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            overflow: auto;
+        }
     }
 }
 </style>
