@@ -31,6 +31,12 @@ const loadImages = () => {
     ipt.accept = ".jpg,.jpeg,.png";
     ipt.multiple = true;
 
+    // 移动端限制 页面需存在该 dom 才能触发事件
+    ipt.style.position = 'absolute'
+    ipt.style.left = '-500px'
+    ipt.style.top = '-500px'
+    document.body.appendChild(ipt)
+
     ipt.onchange = () => {
         const files = ipt.files;
 
@@ -53,6 +59,7 @@ const loadImages = () => {
                     console.log(`error occurred when reading "${ files[i].name }": `, e);
                 }
                 reader.readAsDataURL(files[i]);
+                document.body.removeChild(ipt)
             } catch (e) {
                 console.log(`error occurred when solving "${ files[i].name }": `, e);
             }
@@ -114,17 +121,19 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
 </script>
 
 <template>
-    <Splitter class="home" style="height: 100%">
+    <Splitter class="mobile" style="height: 100%" layout="vertical">
         <SplitterPanel class="panel-container" :size="20" :minSize="20">
             <div class="panel-title">
                 <div class="btn" @click="loadImages">导入</div>
                 <div class="btn" @click="clearImg">清空</div>
             </div>
-            <ImgOverview :class="['single-img', activeImgIdx === idx ? 'active' : 'default']"
-                         v-for="(item, idx) in panelItems" :key="idx" :pic="item"
-                         @direct50="downloadImg(item.filename, item.base64,50, 50)"
-                         @del-img="deleteImg(idx)"
-                         @click="updateWorkspace(idx)"/>
+            <div class="img-container">
+                <ImgOverview :class="['single-img', activeImgIdx === idx ? 'active' : 'default']"
+                             v-for="(item, idx) in panelItems" :key="idx" :pic="item"
+                             @direct50="downloadImg(item.filename, item.base64,50, 50)"
+                             @del-img="deleteImg(idx)"
+                             @click="updateWorkspace(idx)"/>
+            </div>
         </SplitterPanel>
         <SplitterPanel class="workspace-container" :size="80" :minSize="70">
             <ImgWorkspace v-if="activeImgIdx >= 0 && activeImgIdx < panelItems.length"
@@ -137,7 +146,7 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
 <style lang="scss" scoped>
 @use "src/styles/mixin";
 
-.home {
+.mobile {
     position: relative;
     width: 100%;
     height: 100%;
@@ -145,12 +154,16 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
     .panel-container {
         @include mixin.scrollBarStyle(#aaa7);
         padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
         overflow: hidden auto;
 
         .panel-title {
-            position: sticky;
-            z-index: 10;
-            top: 0;
+            position: relative;
+            width: 100%;
+            height: 1.75rem;
             color: #777;
             font-size: 0.875rem;
             display: flex;
@@ -164,16 +177,32 @@ const downloadImg = (filename: string, base64: string, w: number, h: number) => 
             }
         }
 
-        .single-img {
-            margin: 10px 0;
-        }
+        .img-container {
+            @include mixin.scrollBarStyle(#aaa7);
+            position: relative;
+            width: 100%;
+            height: calc(100% - 2rem);
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
 
-        .active {
-            border-color: green;
+            .single-img {
+                width: 15rem;
+                min-width: 15rem;
+                margin: 0 10px;
+            }
+
+            .active {
+                border-color: green;
+            }
         }
     }
 
     .workspace-container {
+        @include mixin.scrollBarStyle(#aaa7);
+        overflow: auto;
+
         .wrapper {
             width: 100%;
             height: 100%;
